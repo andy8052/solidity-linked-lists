@@ -6,6 +6,9 @@ More documentation to come
 
 ## TODO
 ✔️ Finalize code logic
+
 ⭕️ Clean up comments
+
 ⭕️ Write tests
+
 ⭕️ Update README with examples
