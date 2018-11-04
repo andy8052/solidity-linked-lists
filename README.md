@@ -1,7 +1,5 @@
-# truffle-init-default
+# Solidity Linked Lists
 
-Default project for Truffle: example contracts, migrations and tests
+This was inspired by [this Zeppelin issue](https://github.com/OpenZeppelin/openzeppelin-solidity/issues/1240)
 
-## Usage
-
-See the [Truffle documentation](http://truffleframework.com/docs/) for more info.
+More documentation to come
