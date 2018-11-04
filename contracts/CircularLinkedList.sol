@@ -4,123 +4,122 @@ pragma solidity ^0.4.24;
 /// @author Andy Chorlian - <andychorlian@gmail.com>
 contract CircularLinkedList {
 
-    event AddressAdded(address _address);
-    event AddressRemoved(address _address);
+    event Added(address added);
+    event Removed(address removed);
 
     address public tail = 0x0;
-    mapping(address => address) internal _addresses;
-    uint256 addressCount;
+    mapping(address => address) internal objects;
+    uint256 count;
 
     /// @dev Setup function sets initial storage of contract.
-    /// @param _addressList List of addresses to start with.
-    function initialize(address[] _addressList)
+    /// @param _list List of addresses to start with.
+    function initialize(address[] _list)
         internal
     {
         // Initializing.
-        address currentAddress = _addressList[0];
-        for (uint256 i = 1; i < _addressList.length; i++) {
+        address current = _list[0];
+        for (uint256 i = 1; i < _list.length; i++) {
             // address cannot be null.
-            address newAddress = _addressList[i];
-            require(newAddress != 0 && newAddress != _addressList[0], "Invalid new address provided");
+            address next = _list[i];
+            require(next != 0 && next != _list[0], "Invalid new address provided");
             // No duplicate addresses allowed.
-            require(_addresses[newAddress] == 0, "Duplicate new address provided");
-            _addresses[currentAddress] = newAddress;
-            currentAddress = newAddress;
+            require(objects[next] == 0, "Duplicate new address provided");
+            objects[current] = next;
+            current = next;
         }
-        _addresses[currentAddress] = _addressList[0];
-        tail = currentAddress;
-        addressCount = _addressList.length;
+        objects[current] = _list[0];
+        tail = current;
+        count = _list.length;
     }
 
-    /// @dev Allows to add a new owner to the Safe and update the threshold at the same time.
-    ///      This can only be done via a Safe transaction.
-    /// @param _address New owner address.
-    function addAddress(address _address)
+    /// @dev Allows to add a new address
+    /// @param _object New address.
+    function add(address _object)
         public
     {
         // Owner address cannot be null.
-        require(_address != 0, "Invalid address provided");
+        require(_object != 0, "Invalid address provided");
         // No duplicate addresses allowed.
-        require(_addresses[_address] == 0, "Address is already an owner");
+        require(objects[_object] == 0, "Address is already an owner");
 
         // Insert new address to start of list
-        address oldHead = _addresses[tail];
-        _addresses[tail] = _address;
-        _addresses[_address] = oldHead;
+        address oldHead = objects[tail];
+        objects[tail] = _object;
+        objects[_object] = oldHead;
 
-        addressCount++;
-        emit AddressAdded(_address);
+        count++;
+        emit Added(_object);
     }
 
     /// @dev Allows to remove an address.
-    /// @param _prevAddress address that pointed to the address to be removed in the linked list
-    /// @param _address address to be removed.
-    function remove(address _prevAddress, address _address)
+    /// @param _previous address that pointed to the address to be removed in the linked list
+    /// @param _object address to be removed.
+    function remove(address _previous, address _object)
         public
     {
         // Validate address and check that it corresponds to index.
-        require(_address != 0, "Invalid owner address provided");
-        require(_addresses[_prevAddress] == _address, "Invalid prevAddress, address pair provided");
+        require(_object != 0, "Invalid owner address provided");
+        require(objects[_previous] == _object, "Invalid prevAddress, address pair provided");
 
-        if (_address == tail){
-            tail == _prevAddress;
+        if (_object == tail){
+            tail == _previous;
         }
 
-        _addresses[_prevAddress] = _addresses[_address];
-        _addresses[_address] = 0;
-        addressCount--;
-        emit AddressRemoved(_address);
+        objects[_previous] = objects[_object];
+        objects[_object] = 0;
+        count--;
+        emit Removed(_object);
     }
 
     /// @dev Allows to swap/replace an address with another address.
-    /// @param prevAddress Owner that pointed to the owner to be replaced in the linked list
-    /// @param oldAddress Owner address to be replaced.
-    /// @param newAddress New owner address.
-    function swapAddress(address prevAddress, address oldAddress, address newAddress)
+    /// @param _previous Owner that pointed to the owner to be replaced in the linked list
+    /// @param _old Owner address to be replaced.
+    /// @param _new New owner address.
+    function swap(address _previous, address _old, address _new)
         public
     {
         // Owner address cannot be null.
-        require(newAddress != 0, "Invalid owner address provided");
+        require(_new != 0, "Invalid owner address provided");
         // No duplicate owners allowed.
-        require(_addresses[newAddress] == 0, "Address is already added");
+        require(objects[_new] == 0, "Address is already added");
         // Validate oldOwner address and check that it corresponds to owner index.
-        require(oldAddress != 0, "Invalid address provided");
-        require(_addresses[prevAddress] == oldAddress, "Invalid prevOwner, owner pair provided");
+        require(_old != 0, "Invalid address provided");
+        require(objects[_previous] == _old, "Invalid prevOwner, owner pair provided");
 
-        if (oldAddress == tail){
-            tail == newAddress;
+        if (_new == tail){
+            tail == _new;
         }
 
-        _addresses[newAddress] = _addresses[oldAddress];
-        _addresses[prevAddress] = newAddress;
-        _addresses[oldAddress] = 0;
-        emit AddressRemoved(oldAddress);
-        emit AddressAdded(newAddress);
+        objects[_new] = objects[_old];
+        objects[_previous] = _new;
+        objects[_old] = 0;
+        emit Removed(_old);
+        emit Added(_new);
     }
 
-    function contains(address _address)
+    function contains(address _object)
         public
         view
         returns (bool)
     {
-        return _addresses[_address] != 0;
+        return objects[_object] != 0;
     }
 
     /// @dev Returns array of owners.
     /// @return Array of Safe owners.
-    function getAddresses()
+    function getAll()
         public
         view
         returns (address[])
     {
-        address[] memory array = new address[](addressCount);
+        address[] memory array = new address[](count);
 
         // populate return array
         uint256 index = 0;
-        address currentAddress = _addresses[tail];
-        while(currentAddress != _addresses[tail]) {
-            array[index] = currentAddress;
-            currentAddress = _addresses[currentAddress];
+        address current = objects[tail];
+        while(current != objects[tail]) {
+            array[index] = current;
+            current = objects[current];
             index ++;
         }
         return array;

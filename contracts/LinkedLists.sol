@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-/// @title LinkedList - Manages a set of owners and a threshold to perform actions.
+/// @title LinkedList - Manages a set of objects.
 /// @author Andy Chorlian - <andychorlian@gmail.com>
 contract LinkedList {
 
@@ -32,51 +32,48 @@ contract LinkedList {
         count = _list.length;
     }
 
-    /// @dev Allows to add a new owner to the Safe and update the threshold at the same time.
-    ///      This can only be done via a Safe transaction.
-    /// @param _address New owner address.
-    function add(address _added)
+    /// @dev Allows to add a new object
+    /// @param _object New address
+    function add(address _object)
         public
     {
-        // Owner address cannot be null.
-        require(_added != 0 && _added != SENTINEL, "Invalid owner address provided");
-        // No duplicate owners allowed.
-        require(objects[_added] == 0, "Address is already an owner");
-        objects[_added] = objects[SENTINEL];
-        objects[SENTINEL] = _added;
+        require(_object != 0 && _object != SENTINEL, "Invalid address provided");
+        require(objects[_object] == 0, "Address is already added");
+
+        objects[_object] = objects[SENTINEL];
+        objects[SENTINEL] = _object;
         addressCount++;
-        emit AddressAdded(_added);
+        emit AddressAdded(_object);
     }
 
     /// @dev Allows to remove an address.
     /// @param _prevAddress address that pointed to the address to be removed in the linked list
     /// @param _address address to be removed.
-    function remove(address _previous, address _removed)
+    function remove(address _previous, address _object)
         public
     {
         // Validate address and check that it corresponds to index.
-        require(_removed != 0 && _removed != SENTINEL, "Invalid owner address provided");
-        require(objects[_previous] == _removed, "Invalid prevOwner, owner pair provided");
-        objects[_previous] = objects[_removed];
-        objects[_removed] = 0;
+        require(_object != 0 && _object != SENTINEL, "Invalid address provided");
+        require(objects[_previous] == _object, "Invalid _previous, _object pair provided");
+
+        objects[_previous] = objects[_object];
+        objects[_object] = 0;
         addressCount--;
-        emit AddressRemoved(_removed);
+        emit AddressRemoved(_object);
     }
 
     /// @dev Allows to swap/replace an address with another address.
-    /// @param prevAddress Owner that pointed to the owner to be replaced in the linked list
-    /// @param oldAddress Owner address to be replaced.
-    /// @param newAddress New owner address.
+    /// @param _previous object that pointed to the object to be replaced in the linked list
+    /// @param _old object to be replaced.
+    /// @param _new New object
     function swap(address _previous, address _old, address _new)
         public
     {
-        // Owner address cannot be null.
-        require(_new != 0 && _new != SENTINEL, "Invalid owner address provided");
-        // No duplicate owners allowed.
-        require(objects[_new] == 0, "Address is already an owner");
-        // Validate oldOwner address and check that it corresponds to owner index.
-        require(_old != 0 && _old != SENTINEL, "Invalid owner address provided");
-        require(objects[_previous] == _old, "Invalid prevOwner, owner pair provided");
+        require(_new != 0 && _new != SENTINEL, "Invalid _new address provided");
+        require(objects[_new] == 0, "Address is already added");
+        require(_old != 0 && _old != SENTINEL, "Invalid _old address provided");
+        require(objects[_previous] == _old, "Invalid _previous, _old pair provided");
+
         objects[_new] = objects[_old];
         objects[_previous] = _new;
         objects[_old] = 0;
@@ -92,8 +89,8 @@ contract LinkedList {
         return objects[_object] != 0;
     }
 
-    /// @dev Returns array of owners.
-    /// @return Array of Safe owners.
+    /// @dev Returns array of objects.
+    /// @return Array of addresses.
     function getAll()
         public
         view
