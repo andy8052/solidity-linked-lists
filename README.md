@@ -7,7 +7,7 @@ More documentation to come
 ## TODO
 ✔️ Finalize code logic
 
-⭕️ Clean up comments
+✔️ Clean up comments
 
 ⭕️ Write tests
 

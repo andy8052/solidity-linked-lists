@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-/// @title LinkedList - Manages a set of owners and a threshold to perform actions.
+/// @title CircularLinkedList - Manages a set of objects.
 /// @author Andy Chorlian - <andychorlian@gmail.com>
 contract CircularLinkedList {
 
@@ -37,10 +37,10 @@ contract CircularLinkedList {
     function add(address _object)
         public
     {
-        // Owner address cannot be null.
+        // address cannot be null.
         require(_object != 0, "Invalid address provided");
         // No duplicate addresses allowed.
-        require(objects[_object] == 0, "Address is already an owner");
+        require(objects[_object] == 0, "Address is already added");
 
         // Insert new address to start of list
         address oldHead = objects[tail];
@@ -58,7 +58,7 @@ contract CircularLinkedList {
         public
     {
         // Validate address and check that it corresponds to index.
-        require(_object != 0, "Invalid owner address provided");
+        require(_object != 0, "Invalid address provided");
         require(objects[_previous] == _object, "Invalid prevAddress, address pair provided");
 
         if (_object == tail){
@@ -72,19 +72,19 @@ contract CircularLinkedList {
     }
 
     /// @dev Allows to swap/replace an address with another address.
-    /// @param _previous Owner that pointed to the owner to be replaced in the linked list
-    /// @param _old Owner address to be replaced.
-    /// @param _new New owner address.
+    /// @param _previous address that pointed to the address to be replaced in the linked list
+    /// @param _old address to be replaced.
+    /// @param _new New address.
     function swap(address _previous, address _old, address _new)
         public
     {
-        // Owner address cannot be null.
-        require(_new != 0, "Invalid owner address provided");
-        // No duplicate owners allowed.
+        // address cannot be null.
+        require(_new != 0, "Invalid address provided");
+        // No duplicates allowed.
         require(objects[_new] == 0, "Address is already added");
-        // Validate oldOwner address and check that it corresponds to owner index.
+        // Validate old address and check that it corresponds to an index.
         require(_old != 0, "Invalid address provided");
-        require(objects[_previous] == _old, "Invalid prevOwner, owner pair provided");
+        require(objects[_previous] == _old, "Invalid _previous, _old pair provided");
 
         if (_new == tail){
             tail == _new;
@@ -105,8 +105,8 @@ contract CircularLinkedList {
         return objects[_object] != 0;
     }
 
-    /// @dev Returns array of owners.
-    /// @return Array of Safe owners.
+    /// @dev Returns array of objects.
+    /// @return Array of addresses.
     function getAll()
         public
         view

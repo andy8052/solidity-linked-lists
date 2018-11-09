@@ -13,7 +13,7 @@ contract LinkedList {
     uint256 count;
 
     /// @dev Setup function sets initial storage of contract.
-    /// @param _addressList List of addresses to start with.
+    /// @param _list List of addresses to start with.
     function initialize(address[] _list)
         internal
     {
@@ -42,8 +42,8 @@ contract LinkedList {
 
         objects[_object] = objects[SENTINEL];
         objects[SENTINEL] = _object;
-        addressCount++;
-        emit AddressAdded(_object);
+        count++;
+        emit Added(_object);
     }
 
     /// @dev Allows to remove an address.
@@ -58,8 +58,8 @@ contract LinkedList {
 
         objects[_previous] = objects[_object];
         objects[_object] = 0;
-        addressCount--;
-        emit AddressRemoved(_object);
+        count--;
+        emit Removed(_object);
     }
 
     /// @dev Allows to swap/replace an address with another address.
@@ -77,8 +77,8 @@ contract LinkedList {
         objects[_new] = objects[_old];
         objects[_previous] = _new;
         objects[_old] = 0;
-        emit AddressRemoved(_old);
-        emit AddressAdded(_new);
+        emit Removed(_old);
+        emit Added(_new);
     }
 
     function contains(address _object)
@@ -98,7 +98,6 @@ contract LinkedList {
     {
         address[] memory array = new address[](count);
 
-        // populate return array
         uint256 index = 0;
         address current = objects[SENTINEL];
         while(current != SENTINEL) {
